@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -70,9 +71,9 @@ func Watch(params *Params) error {
 		}
 	}()
 
-	err = watcher.Add(params.Directory)
+	err = addDirectoryRecursively(watcher, params.Directory)
 	if err != nil {
-		return fmt.Errorf("failed to add directory: %w", err)
+		return fmt.Errorf("failed to add directory recursively: %w", err)
 	}
 
 	<-make(chan struct{})
@@ -80,6 +81,7 @@ func Watch(params *Params) error {
 	return nil
 }
 
+// getStdoutPipeAndStderrPipe gets stdout pipe and stderr pipe.
 func getStdoutPipeAndStderrPipe(cmd *exec.Cmd) (io.ReadCloser, io.ReadCloser, error) {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -92,4 +94,19 @@ func getStdoutPipeAndStderrPipe(cmd *exec.Cmd) (io.ReadCloser, io.ReadCloser, er
 	}
 
 	return stdout, stderr, nil
+}
+
+func addDirectoryRecursively(watcher *fsnotify.Watcher, watchDir string) error {
+	if err := filepath.Walk(watchDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			if err := watcher.Add(path); err != nil {
+				return fmt.Errorf("failed to add directory: %w", err)
+			}
+		}
+		return nil
+	}); err != nil {
+		return fmt.Errorf("failed to walk directory: %w", err)
+	}
+
+	return nil
 }
