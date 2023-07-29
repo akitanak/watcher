@@ -1,8 +1,7 @@
-package main
+package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -35,9 +34,9 @@ func init() {
 	cmd.Flags().StringVarP(&params.Directory, "directory", "d", "./", "directory to watch")
 }
 
-func main() {
+func Execute() error {
 	if err := cmd.Execute(); err != nil {
-		fmt.Printf("failed to execute watcher: %s", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to execute watcher: %w", err)
 	}
+	return nil
 }
