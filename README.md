@@ -10,6 +10,12 @@ go install github.com/akitanak/watcher
 
 ## Usage
 
+If you want to watch current directory and run `go test` when some code was changed, run a command below.
 ```
-watcher echo 'hello world.'
+watcher go test
+```
+
+If you want to monitor a specific directory, specify the directory with `--directory`.
+```
+watcher --directory ./src go test
 ```

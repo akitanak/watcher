@@ -37,28 +37,13 @@ func Watch(params *Params) error {
 					logEvent(event)
 					log.Printf("run command: %s", params.Command)
 					cmd := exec.Command("sh", "-c", strings.Join(params.Command, " "))
-					stdout, stderr, err := getStdoutPipeAndStderrPipe(cmd)
-					if err != nil {
-						log.Fatalf("failed to get stdout pipe: %w", err)
+					if err := redirectCommandStdoutAndStderr(cmd); err != nil {
+						log.Fatalf("failed to redirect stdout and stderr: %s", err)
 					}
 
 					if err := cmd.Start(); err != nil {
 						log.Fatalf("failed to run command: %s", err)
 					}
-
-					go func() {
-						_, err := io.Copy(os.Stdout, stdout)
-						if err != nil {
-							fmt.Println("failed to copy stdout: %w", err)
-						}
-					}()
-
-					go func() {
-						_, err := io.Copy(os.Stderr, stderr)
-						if err != nil {
-							fmt.Println("failed to copy stderr: %w", err)
-						}
-					}()
 
 					if err := cmd.Wait(); err != nil {
 						log.Fatalf("failed to wait command: %s", err)
@@ -80,6 +65,29 @@ func Watch(params *Params) error {
 
 	<-make(chan struct{})
 
+	return nil
+}
+
+// redirectCommandStdoutAndStderr redirects stdout and stderr to os.Stdout and os.Stderr.
+func redirectCommandStdoutAndStderr(cmd *exec.Cmd) error {
+	stdout, stderr, err := getStdoutPipeAndStderrPipe(cmd)
+	if err != nil {
+		return fmt.Errorf("failed to get stdout pipe: %w", err)
+	}
+
+	go func() {
+		_, err := io.Copy(os.Stdout, stdout)
+		if err != nil {
+			fmt.Println("failed to copy stdout: %w", err)
+		}
+	}()
+
+	go func() {
+		_, err := io.Copy(os.Stderr, stderr)
+		if err != nil {
+			fmt.Println("failed to copy stderr: %w", err)
+		}
+	}()
 	return nil
 }
 
