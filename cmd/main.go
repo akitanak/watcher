@@ -13,12 +13,9 @@ import (
 var cmd = &cobra.Command{
 	Use:   "watcher",
 	Short: "run some commands when some files are changed",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Watcher is a command-line utility designed to monitor a specified directory and its subdirectories for any file modifications.
+Once a change is detected, the tool automatically executes a user-specified command,
+providing a flexible and automated solution for various tasks.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
