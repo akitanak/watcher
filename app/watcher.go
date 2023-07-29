@@ -12,11 +12,13 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// Params represents parameters for watcher.
 type Params struct {
 	Directory string
 	Command   []string
 }
 
+// Watch watches directory and runs command.
 func Watch(params *Params) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
