@@ -30,6 +30,7 @@ var params = app.Params{}
 func init() {
 	cmd.Flags().StringVarP(&params.Directory, "directory", "d", "./", "directory to watch")
 	cmd.Flags().StringSliceVarP(&params.Filters, "filters", "f", []string{}, "filters to watch files")
+	cmd.Flags().BoolVarP(&params.ExitOnError, "exit-on-error", "e", false, "exit on error")
 }
 
 // Execute executes the watcher command.
