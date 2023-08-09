@@ -5,7 +5,7 @@
 ## Install
 
 ```
-go install github.com/akitanak/watcher
+go install github.com/akitanak/watcher@latest
 ```
 
 ## Usage
