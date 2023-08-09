@@ -14,9 +14,10 @@ import (
 
 // Params represents parameters for watcher.
 type Params struct {
-	Directory string
-	Filters   []string
-	Command   []string
+	Directory   string
+	Filters     []string
+	Command     []string
+	ExitOnError bool
 }
 
 // Watch watches directory and runs command.
@@ -51,7 +52,7 @@ func Watch(params *Params) error {
 							log.Fatalf("failed to run command: %s", err)
 						}
 
-						if err := cmd.Wait(); err != nil {
+						if err := cmd.Wait(); err != nil && params.ExitOnError {
 							log.Fatalf("failed to wait command: %s", err)
 						}
 					}
