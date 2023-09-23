@@ -36,7 +36,7 @@ func Watch(params *Params) error {
 					return
 				}
 				if eventMatchAsTargetOp(event) {
-					matched, err := doesFileNameMatchFilters(event, *params)
+					matched, err := doesFileNameMatchFilters(event.Name, *params)
 					if err != nil {
 						log.Fatalf("failed to match file name: %s", err)
 					}
@@ -79,23 +79,6 @@ func Watch(params *Params) error {
 // eventMatchAsTargetOp checks if event matches as target op.
 func eventMatchAsTargetOp(event fsnotify.Event) bool {
 	return event.Has(fsnotify.Write) || event.Has(fsnotify.Create) || event.Has(fsnotify.Remove)
-}
-
-func doesFileNameMatchFilters(event fsnotify.Event, params Params) (bool, error) {
-	if len(params.Filters) == 0 {
-		return true, nil
-	}
-
-	for _, filter := range params.Filters {
-		matched, err := filepath.Match(filter, filepath.Base(event.Name))
-		if err != nil {
-			return false, fmt.Errorf("failed to match file name: %w", err)
-		}
-		if matched {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 // redirectCommandStdoutAndStderr redirects stdout and stderr to os.Stdout and os.Stderr.
