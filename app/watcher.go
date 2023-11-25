@@ -18,13 +18,14 @@ type Params struct {
 }
 
 // Watch watches directory and runs command.
-func Watch(params *Params) error {
+func Watch(params *Params, receiver chan<- []byte) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return fmt.Errorf("failed to create watcher: %w", err)
 	}
 	defer watcher.Close()
 
+	eventHandler := NewEventHandler(params, receiver)
 	go func() {
 		for {
 			select {
@@ -32,7 +33,7 @@ func Watch(params *Params) error {
 				if !ok {
 					return
 				}
-				if err := handleEvent(params, event); err != nil {
+				if err := eventHandler.HandleEvent(event); err != nil {
 					log.Fatalf("failed to handle event: %s", err)
 				}
 			case err, ok := <-watcher.Errors:
