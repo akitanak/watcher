@@ -18,7 +18,9 @@ providing a flexible and automated solution for various tasks.`,
 	Args: cobra.MatchAll(cobra.MinimumNArgs(1)),
 	RunE: func(_ *cobra.Command, args []string) error {
 		params.Command = args
-		if err := app.Watch(&params); err != nil {
+		receiver := make(chan []byte)
+		go app.NewStdoutPrinter(receiver).Print()
+		if err := app.Watch(&params, receiver); err != nil {
 			return fmt.Errorf("failed to watch: %w", err)
 		}
 		return nil
